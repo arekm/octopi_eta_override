@@ -13,7 +13,7 @@ def pETAeveryLine(comm, line, *args, **kwargs):
     global eta, r
     m = r.search(line)
     if m:
-        eta = int(m.group(0)) * 60
+        eta = int(m.group(1)) * 60
     return line
 
 
