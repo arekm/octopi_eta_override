@@ -1,0 +1,4 @@
+include README.md
+recursive-include octoprint_PrusaETAOverride/templates *
+recursive-include octoprint_PrusaETAOverride/translations *
+recursive-include octoprint_PrusaETAOverride/static *
