@@ -2,18 +2,21 @@
 from __future__ import absolute_import
 import octoprint.plugin
 import re
+import time
 from octoprint.printer.estimation import PrintTimeEstimator
 
 eta = 0
+ts = int(time.time())
 r = re.compile(
     r'NORMAL MODE: Percent done: \d+; print time remaining in mins: (\d+)')
 
 
 def pETAeveryLine(comm, line, *args, **kwargs):
-    global eta, r
+    global eta, r, ts
     m = r.search(line)
     if m:
         eta = int(m.group(1)) * 60
+        ts = int(time.time())
     return line
 
 
@@ -42,7 +45,7 @@ class pETAPrintTimeEstimator(PrintTimeEstimator):
         super(pETAPrintTimeEstimator, self).__init__(job_type)
 
     def estimate(self, progress, printTime, cleanedPrintTime, statisticalTotalPrintTime, statisticalTotalPrintTimeType):
-        return eta, "estimate"
+        return eta - (int(time.time()) - ts), "estimate"
 
 
 def pETAfactory(*args, **kwargs):
