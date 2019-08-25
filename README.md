@@ -1,6 +1,6 @@
 # Prusa ETA Override
 
-Prusa "NORMAL MODE: Percent done:" messages ETA override for OctoPi
+Prusa "NORMAL MODE: Percent done:" messages ETA override for OctoPi allowing to get exact ETA in case of printing from SD.
 
 ## Setup
 
