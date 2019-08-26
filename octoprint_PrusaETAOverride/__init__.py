@@ -4,19 +4,31 @@ import octoprint.plugin
 import re
 import time
 from octoprint.printer.estimation import PrintTimeEstimator
+from octoprint.events import eventManager, Events
 
 eta = 0
+oldZ = 0.0
+
 ts = int(time.time())
 r = re.compile(
     r'NORMAL MODE: Percent done: \d+; print time remaining in mins: (\d+)')
+p = re.compile(
+    r'^X:\d+\.\d+ Y:\d+\.\d+ Z:(\d+\.\d+) ')
 
 
 def pETAeveryLine(comm, line, *args, **kwargs):
-    global eta, r, ts
+    global eta, r, ts, oldZ
     m = r.search(line)
     if m:
         eta = int(m.group(1)) * 60
         ts = int(time.time())
+        comm._sendCommand("M114")
+    z = p.search(line)
+    if z:
+        newZ = float(z.group(1))
+        if newZ != oldZ:
+            eventManager().fire(Events.Z_CHANGE, {"new": newZ, "old": oldZ})
+            oldZ = newZ
     return line
 
 
