@@ -1,6 +1,6 @@
 # Prusa ETA Override
 
-Prusa "NORMAL MODE: Percent done:" messages ETA override for OctoPi allowing to get exact ETA in case of printing from SD. Also this plugin queries for position every minute (M114) and also fires z-change event (to support sending status message every X milimeters via telegram :) )
+Prusa "NORMAL MODE: Percent done:" messages ETA override for OctoPrint allowing to get exact ETA in case of printing from SD. Also this plugin queries for position every minute (M114) and also fires z-change event (to support sending status message every X milimeters via telegram :) )
 
 ## Setup
 
