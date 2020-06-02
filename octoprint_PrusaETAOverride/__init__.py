@@ -8,21 +8,41 @@ from octoprint.events import eventManager, Events
 
 eta = 0
 oldZ = 0.0
+silentMode = 1 #set this to 0 to default to normal
 
 ts = int(time.time())
+silentSearch = re.compile(r'SILENT MODE: ENABLED')
+normalSearch = re.compile(r'SILENT MODE: DISABLED')
 r = re.compile(
     r'NORMAL MODE: Percent done: \d+; print time remaining in mins: (\d+)')
+s = re.compile(
+    r'SILENT MODE: Percent done: \d+; print time remaining in mins: (\d+)')
 p = re.compile(
     r'^X:\d+\.\d+ Y:\d+\.\d+ Z:(\d+\.\d+) ')
 
 
 def pETAeveryLine(comm, line, *args, **kwargs):
-    global eta, r, ts, oldZ
-    m = r.search(line)
+    global eta, silentMode, silentSearch, normalSearch, r, s, ts, oldZ
+    
+    qs = silentSearch.search(line)
+    if qs:
+        silentMode = 1
+        
+    ns = normalSearch.search(line)
+    if ns:
+        silentMode = 0
+        
+    if silentMode == 1:
+        m = s.search(line)
+    else:
+        m = r.search(line)
+        
     if m:
         eta = int(m.group(1)) * 60
         ts = int(time.time())
         comm._sendCommand("M114")
+        #note that M919 is only in custom firmware at https://github.com/hergtoler/Prusa-Firmware/tree/MK3_silent_mode_message
+        comm._sendCommand("M919")
     z = p.search(line)
     if z:
         newZ = float(z.group(1))
