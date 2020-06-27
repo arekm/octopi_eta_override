@@ -1,5 +1,5 @@
 # coding=utf-8
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 import octoprint.plugin
 import re
 import time
@@ -65,6 +65,7 @@ def pETAfactory(*args, **kwargs):
 
 
 __plugin_name__ = "Prusa ETA override Plugin"
+__plugin_pythoncompat__ = ">=2.7,<4"
 
 
 def __plugin_load__():
