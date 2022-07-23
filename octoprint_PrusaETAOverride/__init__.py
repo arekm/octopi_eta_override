@@ -29,6 +29,7 @@ class PrusaetaoverridePlugin(octoprint.plugin.OctoPrintPlugin):
         self._logger = logging.getLogger("octoprint.plugins.PrusaETAOverride")
 
         self._estimator = None
+        self.m73_mode = None
 
         # do not match lines with negative progress ("... Percent done: -1; ...")
         self.m73_pattern = re.compile(
@@ -40,9 +41,22 @@ class PrusaetaoverridePlugin(octoprint.plugin.OctoPrintPlugin):
     def parse_line(self, comm, line, *args, **kwargs):
         m = self.m73_pattern.search(line)
         if m:
+
             mode = m.group('mode')
-            if mode != "NORMAL":
+
+            # lock into first MODE we will see
+            if self.m73_mode is None:
+                self.m73_mode = mode
+
+            # but switch to NORMAL if we see it. SILENT will be properly choosen once fixed
+            # in prusa firmware: https://github.com/prusa3d/Prusa-Firmware/pull/2735
+            if self.m73_mode != mode and mode == "NORMAL":
+                self._logger.debug("Switching from mode {} to mode NORMAL".format(self.m73_mode))
+                self.m73_mode = "NORMAL"
+
+            if mode != self.m73_mode:
                 return line
+
             self._estimator.estimated_time = int(m.group('eta')) * 60
             self._estimator.last_update = int(time.time())
             self._logger.debug("Parsed time update for mode {}: {}".format(mode, self._estimator.estimated_time))
