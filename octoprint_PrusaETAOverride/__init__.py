@@ -17,7 +17,7 @@ p = re.compile(
 
 
 def pETAeveryLine(comm, line, *args, **kwargs):
-    global eta, r, ts, oldZ
+    global eta, r, ts
     m = r.search(line)
     if m:
         eta = int(m.group(1)) * 60
@@ -26,9 +26,7 @@ def pETAeveryLine(comm, line, *args, **kwargs):
     z = p.search(line)
     if z:
         newZ = float(z.group(1))
-        if newZ != oldZ:
-            eventManager().fire(Events.Z_CHANGE, {"new": newZ, "old": oldZ})
-            oldZ = newZ
+        comm._callback.on_comm_z_change(newZ)
     return line
 
 
