@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import logging
 import re
 import time
+import types
 
 import octoprint.plugin
 from octoprint.printer.estimation import PrintTimeEstimator
@@ -14,6 +15,7 @@ class PrusaETAPrintTimeEstimator(PrintTimeEstimator):
         self._logger = logging.getLogger("octoprint.plugins.PrusaETAOverride")
         self.last_update = time.time()
         self.estimated_time = -1
+        self.progress = 0
 
     def estimate(self, *args, **kwargs):
         if self.estimated_time < 0:
@@ -24,7 +26,7 @@ class PrusaETAPrintTimeEstimator(PrintTimeEstimator):
         return eta
 
 
-class PrusaetaoverridePlugin(octoprint.plugin.OctoPrintPlugin):
+class PrusaetaoverridePlugin(octoprint.plugin.StartupPlugin):
     def __init__(self):
         self._logger = logging.getLogger("octoprint.plugins.PrusaETAOverride")
 
@@ -37,6 +39,28 @@ class PrusaetaoverridePlugin(octoprint.plugin.OctoPrintPlugin):
         self.m114_pattern = re.compile(
                 r'^X:\d+\.\d+ Y:\d+\.\d+ Z:(?P<z>\d+\.\d+) ')
 
+    def on_startup(self, host, port):
+        self._printer._stateMonitor._on_get_progress = types.MethodType(
+            self.progressCallBack(self._printer._stateMonitor._on_get_progress, self), self._printer
+        )
+
+    def progressCallBack(self, origCallback, plugin):
+        __plugin_self = self
+        def callback(self):
+            result = dict(origCallback())
+            completion = result['completion']
+            printTime = result['printTime']
+            printTimeLeft = result['printTimeLeft']
+
+            if completion is not None and printTime is not None and printTimeLeft is not None:
+                __plugin_self._logger.debug("Overriding completion from {} to {}".format(completion, __plugin_self._estimator.progress))
+                result.update(
+                    completion=__plugin_self._estimator.progress
+                )
+
+            return self._dict(result)
+
+        return callback
 
     def parse_line(self, comm, line, *args, **kwargs):
         m = self.m73_pattern.search(line)
@@ -59,7 +83,8 @@ class PrusaetaoverridePlugin(octoprint.plugin.OctoPrintPlugin):
 
             self._estimator.estimated_time = int(m.group('eta')) * 60
             self._estimator.last_update = int(time.time())
-            self._logger.debug("Parsed time update for mode {}: {}".format(mode, self._estimator.estimated_time))
+            self._estimator.progress = int(m.group('progress'))
+            self._logger.debug("Parsed time update for mode {}: {} ({}%)".format(mode, self._estimator.estimated_time, self._estimator.progress))
             comm._sendCommand("M114")
             return line
 
