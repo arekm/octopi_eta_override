@@ -47,6 +47,10 @@ class PrusaetaoverridePlugin(octoprint.plugin.AssetPlugin):
             self._plugin_manager.send_plugin_message(self._identifier, dict(progress=int(progress)))
 
     def parse_line(self, comm, line, *args, **kwargs):
+        if not self._estimator:
+            self._logger.debug("Estimator not ready yet")
+            return line
+
         m = self.m73_pattern.search(line)
         if m:
 
