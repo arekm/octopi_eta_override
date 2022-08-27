@@ -1,0 +1,10 @@
+parserOptions:
+  ecmaVersion: 2018
+
+overrides:
+  - files:
+      - "*/static/js/**.js"
+    env:
+      browser: true
+      jquery: true
+      es6: true

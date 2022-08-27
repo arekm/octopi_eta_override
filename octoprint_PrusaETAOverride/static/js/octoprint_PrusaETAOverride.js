@@ -9,18 +9,19 @@ $(function () {
 
         // assign the injected parameters, e.g.:
         self.filesViewModel = parameters[0];
-	self.printerStateViewModel = parameters[1];
-	self.progress = 0;
+        self.printerStateViewModel = parameters[1];
+        self.progress = 0;
 
-	self.original_processProgressData = self.printerStateViewModel._processProgressData;
-	self.printerStateViewModel._processProgressData = function(data) {
-		if (self.progress == 0 && data.completion > 0) {
-			data.completion = 0.1;
-		} else {
-			data.completion = self.progress;
-		}
-		self.original_processProgressData(data);
-	};
+        self.original_processProgressData =
+            self.printerStateViewModel._processProgressData;
+        self.printerStateViewModel._processProgressData = function (data) {
+            if (self.progress == 0 && data.completion > 0) {
+                data.completion = 0.1;
+            } else {
+                data.completion = self.progress;
+            }
+            self.original_processProgressData(data);
+        };
 
         self.onDataUpdaterPluginMessage = function (plugin, data) {
             if (plugin != "PrusaETAOverride") {
@@ -28,7 +29,7 @@ $(function () {
             }
 
             if (data.hasOwnProperty("progress")) {
-		self.progress = data["progress"];
+                self.progress = data["progress"];
             }
         };
     }

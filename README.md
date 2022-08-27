@@ -8,3 +8,22 @@ Install via the bundled [Plugin Manager](https://github.com/foosel/OctoPrint/wik
 or manually using this URL:
 
     https://github.com/kanocz/octopi_eta_override/archive/master.zip
+
+## Develop
+
+Setup environment the same way as for OctoPrint development:
+
+https://docs.octoprint.org/en/master/development/environment.html
+
+and use pre-commit hook for checking:
+
+(once)
+```
+pre-commit install
+```
+
+and then
+
+```
+pre-commit run --hook-stage manual --all-files
+```
