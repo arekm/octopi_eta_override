@@ -48,6 +48,26 @@ jobs:
         run: |
           pre-commit run --all-files --show-diff-on-failure
 
+  test-unit:
+    name: 🧪 Unit tests
+    strategy:
+      matrix:
+        python: ["3.7", "3.8", "3.9", "3.10", "3.11-dev"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 🏗  Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+      - name: 🏗  Set up test dependencies
+        run: |
+          pip install octoprint[develop]
+          pip install -e .[develop]
+      - name: 🚀 Run test suite
+        run: |
+          pytest
+
   test-install:
     name: 🧪 Installation tests
     needs: build

@@ -39,9 +39,8 @@ class PrusaetaoverridePlugin(octoprint.plugin.AssetPlugin):
         self._estimator = None
         self.m73_mode = None
 
-        # do not match lines with negative progress ("... Percent done: -1; ...")
         self.m73_pattern = re.compile(
-            r"(?P<mode>\w+) MODE: Percent done: (?P<progress>\d+); print time remaining in mins: (?P<eta>\d+)(?:; Change in mins: (?P<eta_change>-?\d+))?"
+            r"(?P<mode>\w+) MODE: Percent done: (?P<progress>-?\d+); print time remaining in mins: (?P<eta>-?\d+)(?:; Change in mins: (?P<eta_interaction>-?\d+))?"
         )
         self.m114_pattern = re.compile(r"^X:\d+\.\d+ Y:\d+\.\d+ Z:(?P<z>\d+\.\d+) ")
 
@@ -56,46 +55,64 @@ class PrusaetaoverridePlugin(octoprint.plugin.AssetPlugin):
                 self._identifier, dict(progress=int(progress))
             )
 
-    def parse_line(self, comm, line, *args, **kwargs):
-        if not self._estimator:
-            self._logger.debug("Estimator not ready yet")
-            return line
-
+    def parse_line_m73(self, line):
         m = self.m73_pattern.search(line)
+        return m.groupdict() if m else None
+
+    def parse_line_m114(self, line):
+        m = self.m114_pattern.search(line)
+        return m.groupdict() if m else None
+
+    def parse_line(self, comm, line, *args, **kwargs):
+        m = self.parse_line_m73(line)
         if m:
 
-            mode = m.group("mode")
+            # Prusa firmware supports different modes
+            if "mode" in m:
+                mode = m["mode"]
 
-            # lock into first MODE we will see
-            if self.m73_mode is None:
-                self.m73_mode = mode
+                # lock into first MODE we will see
+                if self.m73_mode is None:
+                    self.m73_mode = mode
 
-            # but switch to NORMAL if we see it. SILENT will be properly choosen once fixed
-            # in prusa firmware: https://github.com/prusa3d/Prusa-Firmware/pull/2735
-            if self.m73_mode != mode and mode == "NORMAL":
-                self._logger.debug(
-                    "Switching from mode {} to mode NORMAL".format(self.m73_mode)
-                )
-                self.m73_mode = "NORMAL"
+                # but switch to NORMAL if we see it. SILENT will be properly choosen once fixed
+                # in prusa firmware: https://github.com/prusa3d/Prusa-Firmware/pull/2735
+                if self.m73_mode != mode and mode == "NORMAL":
+                    self._logger.debug(
+                        "Switching from mode {} to mode NORMAL".format(self.m73_mode)
+                    )
+                    self.m73_mode = "NORMAL"
 
-            if mode != self.m73_mode:
-                return line
+                if mode != self.m73_mode:
+                    return line
 
-            self._estimator.estimated_time = int(m.group("eta")) * 60
-            self._estimator.last_update = int(time.time())
-            progress = int(m.group("progress"))
-            self.set_progress(progress)
-            self._logger.debug(
-                "Parsed updates for mode {} - time: {}s, progress: {}%".format(
-                    mode, self._estimator.estimated_time, progress
-                )
-            )
+                self._logger.debug("Parsed update for mode: {}".format(mode))
+
+            if "eta" in m:
+                if not self._estimator:
+                    self._logger.debug("Estimator not ready yet")
+                    return line
+
+                eta = int(m["eta"])
+                if eta >= 0:
+                    self._estimator.estimated_time = eta * 60
+                    self._estimator.last_update = int(time.time())
+                    self._logger.debug(
+                        "Parsed eta update: {}s".format(self._estimator.estimated_time)
+                    )
+
+            if "progress" in m:
+                progress = int(m["progress"])
+                if progress >= 0:
+                    self.set_progress(progress)
+                    self._logger.debug("Parsed progress update: {}%".format(progress))
+
             comm._sendCommand("M114")
             return line
 
-        z = self.m114_pattern.search(line)
+        z = self.parse_line_m114(line)
         if z:
-            newZ = float(z.group("z"))
+            newZ = float(z["z"])
             comm._callback.on_comm_z_change(newZ)
             self._logger.debug("Parsed Z update: {}".format(newZ))
             return line
