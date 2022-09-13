@@ -10,7 +10,9 @@ _logger.setLevel(logging.DEBUG)
 
 @pytest.fixture
 def plugin():
-    return PrusaetaoverridePlugin()
+    p = PrusaetaoverridePlugin()
+    p._logger = logging.getLogger(__name__)
+    return p
 
 
 # test MODE switch and lock

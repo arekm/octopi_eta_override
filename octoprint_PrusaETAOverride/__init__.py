@@ -1,6 +1,5 @@
 from __future__ import absolute_import, unicode_literals
 
-import logging
 import re
 import time
 
@@ -11,31 +10,31 @@ from octoprint.printer.estimation import PrintTimeEstimator
 class PrusaETAPrintTimeEstimator(PrintTimeEstimator):
     def __init__(self, job_type):
         super(PrusaETAPrintTimeEstimator, self).__init__(job_type)
-        self._logger = logging.getLogger("octoprint.plugins.PrusaETAOverride")
+        self._logger = None
         self.last_update = time.time()
         self.estimated_time = -1
 
     def estimate(self, *args, **kwargs):
         if self.estimated_time < 0:
-            self._logger.debug(
-                "self.estimated_time < 0: {}, calling default PrintTimeEstimator".format(
-                    self.estimated_time
+            if self._logger:
+                self._logger.debug(
+                    "self.estimated_time < 0: {}, calling default PrintTimeEstimator".format(
+                        self.estimated_time
+                    )
                 )
-            )
             return PrintTimeEstimator.estimate(self, *args, **kwargs)
         eta = self.estimated_time - (int(time.time() - self.last_update)), "estimate"
-        self._logger.debug(
-            "New eta calculated: {} (self.estimated_time: {}, self.last_update: {}".format(
-                eta, self.estimated_time, self.last_update
+        if self._logger:
+            self._logger.debug(
+                "New eta calculated: {} (self.estimated_time: {}, self.last_update: {}".format(
+                    eta, self.estimated_time, self.last_update
+                )
             )
-        )
         return eta
 
 
 class PrusaetaoverridePlugin(octoprint.plugin.AssetPlugin):
     def __init__(self):
-        self._logger = logging.getLogger("octoprint.plugins.PrusaETAOverride")
-
         self._estimator = None
         self.m73_mode = None
 
@@ -122,6 +121,7 @@ class PrusaetaoverridePlugin(octoprint.plugin.AssetPlugin):
     def estimator_factory(self, *args, **kwargs):
         def factory(*args, **kwargs):
             self._estimator = PrusaETAPrintTimeEstimator(*args, **kwargs)
+            self._estimator._logger = self._logger
             return self._estimator
 
         return factory
