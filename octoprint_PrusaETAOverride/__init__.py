@@ -38,9 +38,20 @@ class PrusaetaoverridePlugin(octoprint.plugin.AssetPlugin):
         self._estimator = None
         self.m73_mode = None
 
-        self.m73_pattern = re.compile(
-            r"(?P<mode>\w+) MODE: Percent done: (?P<progress>-?\d+); print time remaining in mins: (?P<eta>-?\d+)(?:; Change in mins: (?P<eta_interaction>-?\d+))?"
-        )
+        self.m73_patterns = [
+            # Prusa Firmware 3.3.0+
+            re.compile(
+                r"(?P<mode>\w+) MODE: Percent done: (?P<progress>-?\d+); print time remaining in mins: (?P<eta>-?\d+)(?:; Change in mins: (?P<eta_interaction>-?\d+))?"
+            ),
+            # Marlin 2.1.2+ with M73_REPORT_PRUSA option
+            re.compile(
+                r"M73 Percent done:\s+(?P<progress>\d+(?:\.\d+)?);(?: Print time remaining in mins:\s+(?P<eta>\d+(?:\.\d+)?);)?(?: Change in mins:\s+(?P<eta_interaction>\d+(?:\.\d+)?);)?"
+            ),
+            # Marlin 2.1.2+ without M73_REPORT_PRUSA option
+            re.compile(
+                r"M73 Progress:\s+(?P<progress>\d+(?:\.\d+)?)%{0,1};{0,1}(?: Time left:\s+(?P<eta>\d+(?:\.\d+)?)m;{0,1})?(?: Change:\s+(?P<eta_interaction>\d+(?:\.\d+)?)m)?"
+            ),
+        ]
         self.m114_pattern = re.compile(r"^X:\d+\.\d+ Y:\d+\.\d+ Z:(?P<z>\d+\.\d+) ")
 
     def get_assets(self):
@@ -55,8 +66,13 @@ class PrusaetaoverridePlugin(octoprint.plugin.AssetPlugin):
             )
 
     def parse_line_m73(self, line):
-        m = self.m73_pattern.search(line)
-        return m.groupdict() if m else None
+        for r in self.m73_patterns:
+            m = r.search(line)
+            if m:
+                return dict(
+                    filter(lambda item: item[1] is not None, m.groupdict().items())
+                )
+        return None
 
     def parse_line_m114(self, line):
         m = self.m114_pattern.search(line)
@@ -129,15 +145,15 @@ class PrusaetaoverridePlugin(octoprint.plugin.AssetPlugin):
     def get_update_information(self):
         return dict(
             PrusaETAOverride=dict(
-                displayName="Prusa ETA override Plugin",
+                displayName="Slicer M73 ETA override Plugin (Prusa; Marlin 2)",
                 displayVersion=self._plugin_version,
                 # version check: github repository
                 type="github_release",
-                user="kanocz",
+                user="arekm",
                 repo="octopi_eta_override",
                 current=self._plugin_version,
                 # update method: pip
-                pip="https://github.com/kanocz/octopi_eta_override/archive/{target_version}.zip",
+                pip="https://github.com/arekm/octopi_eta_override/archive/{target_version}.zip",
             )
         )
 

@@ -18,7 +18,7 @@ plugin_version = "0.3.0"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
-plugin_description = """ETA override from "NORMAL MODE: Percent done: XX; print time remaining in mins: YY" message"""
+plugin_description = """Slicer M73 reports as ETA override for OctoPrint (Prusa; Marlin 2)"""
 
 # The plugin's author. Can be overwritten within OctoPrint's internal data via __plugin_author__ in the plugin module
 plugin_author = "Anton Skorochod"
