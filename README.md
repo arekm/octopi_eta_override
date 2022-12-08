@@ -38,6 +38,11 @@ echo:  M73 Progress: 10%; Time left: 20.0m; Change: 7m;
 
 (each part of report is optional and configurable in Marlin 2)
 
+Enable Marlin2 options:
+- SET\_PROGRESS\_MANUALLY, SET\_PROGRESS\_PERCENT, SET\_REMAINING\_TIME, SET\_INTERACTION\_TIME,
+  M73\_REPORT.
+Disable Marlin2 options:
+- M73\_REPORT\_SD\_ONLY (disabling allows plugin usage when printing from OctoPrint over USB/serial)
 
 ## Setup
 
