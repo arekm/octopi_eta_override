@@ -86,7 +86,7 @@ class PrusaetaoverridePlugin(octoprint.plugin.AssetPlugin):
                 if self.m73_mode is None:
                     self.m73_mode = mode
 
-                # but switch to NORMAL if we see it. SILENT will be properly choosen once fixed
+                # but switch to NORMAL if we see it. SILENT will be properly chosen once fixed
                 # in prusa firmware: https://github.com/prusa3d/Prusa-Firmware/pull/2735
                 if self.m73_mode != mode and mode == "NORMAL":
                     self._logger.debug(

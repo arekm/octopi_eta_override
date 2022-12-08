@@ -1,9 +1,9 @@
 # ETA Override
 
-The best ETA in 3d printing is ETA comming from slicer software. Slicer adds M73 commands
+The best ETA in 3d printing is ETA coming from slicer software. Slicer adds M73 commands
 with estimations of print progress, time, time until next pause etc.
 
-This plugin uses firmware reports issued to serial output and comming from M73 g-code commands.
+This plugin uses firmware reports issued to serial output and coming from M73 g-code commands.
 Supported firmware issues M73 Reports for SD-card and USB printing.
 
 Data used by plugin:
@@ -12,7 +12,7 @@ Data used by plugin:
   (but due to OctoPrint limitations not in API, see https://github.com/OctoPrint/OctoPrint/issues/4663)
 
 Also this plugin queries for position (M114) when every M73 command parsing happens and fires z-change event
-(to support sending status message every X milimeters via telegram).
+(to support sending status message every X millimeters via telegram).
 
 ## Supported firmware
 
