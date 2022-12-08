@@ -62,46 +62,17 @@ def test_mode(plugin):
             "SILENT MODE: Percent done: -1; print time remaining in mins: -1",
             {"mode": "SILENT", "progress": "-1", "eta": "-1"},
         ),
-        # Marlin, with M73_REPORT_PRUSA
+        # Marlin
         (
-            "echo:  M73 Percent done: 10; Print time remaining in mins: 20; Change in mins: 7;",
+            "echo:  M73 Progress: 10%; Time left: 20m; Change: 7m;",
             {"progress": "10", "eta": "20", "eta_interaction": "7"},
         ),
         (
-            "echo:  M73 Percent done: 10; Print time remaining in mins: 20;",
+            "echo:  M73 Progress: 10%; Time left: 20m;",
             {"progress": "10", "eta": "20"},
         ),
         (
-            "echo:  M73 Percent done: 10; Change in mins: 7;",
-            {"progress": "10", "eta_interaction": "7"},
-        ),
-        (
-            "echo:  M73 Percent done: 10;",
-            {"progress": "10"},
-        ),
-        (
-            "echo:  M73 Percent done:   5; Print time remaining in mins: 10; Change in mins: 3;",
-            {"progress": "5", "eta": "10", "eta_interaction": "3"},
-        ),
-        (
-            "echo:  M73 Percent done:   7.0; Print time remaining in mins: 10; Change in mins: 3;",
-            {"progress": "7.0", "eta": "10", "eta_interaction": "3"},
-        ),
-        (
-            "echo:  M73 Percent done:   7.0; Print time remaining in mins: 10.0; Change in mins: 3.0;",
-            {"progress": "7.0", "eta": "10.0", "eta_interaction": "3.0"},
-        ),
-        # Marlin, without M73_REPORT_PRUSA
-        (
-            "echo:  M73 Progress: 10%; Time left: 20m; Change: 7m",
-            {"progress": "10", "eta": "20", "eta_interaction": "7"},
-        ),
-        (
-            "echo:  M73 Progress: 10%; Time left: 20m",
-            {"progress": "10", "eta": "20"},
-        ),
-        (
-            "echo:  M73 Progress: 10%; Change: 7m",
+            "echo:  M73 Progress: 10%; Change: 7m;",
             {"progress": "10", "eta_interaction": "7"},
         ),
         (
@@ -109,15 +80,15 @@ def test_mode(plugin):
             {"progress": "10"},
         ),
         (
-            "echo:  M73 Progress:   5%; Time left: 10m; Change: 3m",
+            "echo:  M73 Progress:   5%; Time left: 10m; Change: 3m;",
             {"progress": "5", "eta": "10", "eta_interaction": "3"},
         ),
         (
-            "echo:  M73 Progress:   7.0%; Time left: 10m; Change: 3m",
+            "echo:  M73 Progress:   7.0%; Time left: 10m; Change: 3m;",
             {"progress": "7.0", "eta": "10", "eta_interaction": "3"},
         ),
         (
-            "echo:  M73 Progress:   7.0%; Time left: 10.0m; Change: 3.0m",
+            "echo:  M73 Progress:   7.0%; Time left: 10.0m; Change: 3.0m;",
             {"progress": "7.0", "eta": "10.0", "eta_interaction": "3.0"},
         ),
     ],

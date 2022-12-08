@@ -33,13 +33,7 @@ SILENT MODE: Percent done: 21; print time remaining in mins: 34; Change in mins:
 * [Marlin 2](https://github.com/MarlinFirmware/Marlin) (v2.1.2+)
 
 ```
-echo:  M73 Percent done: 10; Print time remaining in mins: 20; Change in mins: 7;
-```
-
-but also other variant (when default M73_REPORT_PRUSA option is disabled)
-
-```
-echo:  M73 Progress: 10%; Time left: 20.0m; Change: 7m
+echo:  M73 Progress: 10%; Time left: 20.0m; Change: 7m;
 ```
 
 (each part of report is optional and configurable in Marlin 2)

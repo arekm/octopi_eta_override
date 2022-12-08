@@ -43,13 +43,9 @@ class PrusaetaoverridePlugin(octoprint.plugin.AssetPlugin):
             re.compile(
                 r"(?P<mode>\w+) MODE: Percent done: (?P<progress>-?\d+); print time remaining in mins: (?P<eta>-?\d+)(?:; Change in mins: (?P<eta_interaction>-?\d+))?"
             ),
-            # Marlin 2.1.2+ with M73_REPORT_PRUSA option
+            # Marlin 2.1.2+ (>= 20221208)
             re.compile(
-                r"M73 Percent done:\s+(?P<progress>\d+(?:\.\d+)?);(?: Print time remaining in mins:\s+(?P<eta>\d+(?:\.\d+)?);)?(?: Change in mins:\s+(?P<eta_interaction>\d+(?:\.\d+)?);)?"
-            ),
-            # Marlin 2.1.2+ without M73_REPORT_PRUSA option
-            re.compile(
-                r"M73 Progress:\s+(?P<progress>\d+(?:\.\d+)?)%{0,1};{0,1}(?: Time left:\s+(?P<eta>\d+(?:\.\d+)?)m;{0,1})?(?: Change:\s+(?P<eta_interaction>\d+(?:\.\d+)?)m)?"
+                r"M73 Progress:\s+(?P<progress>\d+(?:\.\d+)?)%;(?: Time left:\s+(?P<eta>\d+(?:\.\d+)?)m;)?(?: Change:\s+(?P<eta_interaction>\d+(?:\.\d+)?)m;)?"
             ),
         ]
         self.m114_pattern = re.compile(r"^X:\d+\.\d+ Y:\d+\.\d+ Z:(?P<z>\d+\.\d+) ")
