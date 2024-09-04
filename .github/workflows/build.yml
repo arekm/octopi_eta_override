@@ -92,8 +92,9 @@ jobs:
       - name: 🚀 Install wheel
         if: matrix.installable == 'wheel'
         run: |
-          pip install dist/Prusa*ETA*Override*-py2.py3-none-any.whl
+          pip install dist/*.whl
       - name: 🚀 Install source tarball
         if: matrix.installable == 'sdist'
         run: |
-          pip install dist/Prusa*ETA*Override*-*.tar.gz
+          sdist=$(ls dist/*.tar.gz | grep -v source)
+          pip install "$sdist"
