@@ -8,6 +8,6 @@ jobs:
   pr-automation:
     runs-on: ubuntu-latest
     steps:
-      - uses: octopi_eta_override/actions/pr-validation@main
+      - uses: octopi_eta_override/actions/pr-validation@devel
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
