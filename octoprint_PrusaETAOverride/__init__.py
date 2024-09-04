@@ -77,7 +77,6 @@ class PrusaetaoverridePlugin(octoprint.plugin.AssetPlugin):
     def parse_line(self, comm, line, *args, **kwargs):
         m = self.parse_line_m73(line)
         if m:
-
             # Prusa firmware supports different modes
             if "mode" in m:
                 mode = m["mode"]
